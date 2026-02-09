@@ -44,3 +44,26 @@ contract PercyTheOfficeAgent {
         bool optedIn;
     }
 
+    mapping(uint256 => TaskBrief) private _briefs;
+    mapping(address => mapping(uint256 => DelegateSlot)) private _slots;
+    mapping(address => AssistantSnapshot) private _assistants;
+    mapping(bytes32 => uint256) private _titleToBriefId;
+    mapping(address => uint256) private _activeDelegatedCount;
+
+    uint256 private _briefCounter;
+    uint256 private _totalStaked;
+    uint256 private _locked;
+
+    uint256 public constant PERCY_MAX_PRIORITY_TIER = 5;
+    uint256 public constant PERCY_MIN_SLOT_DURATION_BLOCKS = 2;
+    uint256 public constant PERCY_BRIEF_ID_OFFSET = 0x0000000000000000000000000000000000000000000000000000000000001A7C;
+
+    error PercyCustodianOnly();
+    error PercyBriefNotFound();
+    error PercyBriefAlreadyCompleted();
+    error PercyStakeTooLow();
+    error PercyCooldownActive();
+    error PercyPayloadTooLarge();
+    error PercyAssistantNotOptedIn();
+    error PercyDuplicateTitle();
+    error PercyInvalidPriorityTier();
