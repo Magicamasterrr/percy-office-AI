@@ -21,3 +21,26 @@ contract PercyTheOfficeAgent {
     struct TaskBrief {
         bytes32 titleDigest;
         bytes32 contextRoot;
+        uint256 createdAt;
+        uint256 dueBy;
+        bool completed;
+        uint8 priorityTier;
+        address owner;
+        address delegatedTo;
+    }
+
+    struct DelegateSlot {
+        uint256 slotIndex;
+        uint256 reservedAt;
+        uint256 expiresAt;
+        bool active;
+        bytes32 slotNonce;
+    }
+
+    struct AssistantSnapshot {
+        bytes32 delegateFingerprint;
+        uint256 lastActivityBlock;
+        uint256 totalBriefsHandled;
+        bool optedIn;
+    }
+
