@@ -136,3 +136,26 @@ contract PercyTheOfficeAgent {
             priorityTier: priorityTier_,
             owner: msg.sender,
             delegatedTo: address(0)
+        });
+        _titleToBriefId[titleDigest_] = id;
+        _totalStaked += msg.value;
+
+        emit BriefSubmitted(id, titleDigest_, msg.sender, priorityTier_);
+    }
+
+    function completeBrief(uint256 briefId_) external {
+        TaskBrief storage b = _briefs[briefId_];
+        if (b.owner == address(0)) revert PercyBriefNotFound();
+        if (b.completed) revert PercyBriefAlreadyCompleted();
+        if (b.owner != msg.sender && b.delegatedTo != msg.sender) revert PercyCustodianOnly();
+
+        b.completed = true;
+        if (b.delegatedTo != address(0)) {
+            _activeDelegatedCount[b.delegatedTo]--;
+        }
+        if (_assistants[msg.sender].delegateFingerprint != bytes32(0)) {
+            _assistants[msg.sender].totalBriefsHandled++;
+            _assistants[msg.sender].lastActivityBlock = block.number;
+        }
+        emit BriefCompleted(briefId_, msg.sender);
+    }
