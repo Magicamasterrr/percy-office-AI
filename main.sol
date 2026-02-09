@@ -228,3 +228,26 @@ contract PercyTheOfficeAgent {
         bytes32 delegateFingerprint,
         uint256 lastActivityBlock,
         uint256 totalBriefsHandled,
+        bool optedIn
+    ) {
+        AssistantSnapshot storage a = _assistants[assistant_];
+        return (
+            a.delegateFingerprint,
+            a.lastActivityBlock,
+            a.totalBriefsHandled,
+            a.optedIn
+        );
+    }
+
+    function briefIdByTitle(bytes32 titleDigest_) external view returns (uint256) {
+        return _titleToBriefId[titleDigest_];
+    }
+
+    function totalBriefs() external view returns (uint256) {
+        return _briefCounter;
+    }
+
+    function totalStaked() external view returns (uint256) {
+        return _totalStaked;
+    }
+}
