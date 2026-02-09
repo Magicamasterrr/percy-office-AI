@@ -90,3 +90,26 @@ contract PercyTheOfficeAgent {
 
     constructor() {
         officeCustodian = msg.sender;
+        schedulingEpoch = block.timestamp;
+        minBriefStakeWei = 0.02 ether;
+        genesisScheduleHash = keccak256(
+            abi.encodePacked(
+                "percy.office.v1.genesis",
+                block.chainid,
+                block.timestamp,
+                uint256(0x8F3A2C1E9B4D7A0C6E5F1D8B2A9C4E7F0D3B6A1C)
+            )
+        );
+        slotCooldownBlocks = 8;
+        maxBriefPayloadBytes = 2048;
+        maxConcurrentTasksPerDelegate = 12;
+        officeHoursStartUtc = 9 * 3600;
+        officeHoursEndUtc = 18 * 3600;
+        percyDomainSeparator = keccak256(
+            abi.encode(
+                keccak256("PercyOfficeAgent(uint256 chainId,address verifyingContract)"),
+                block.chainid,
+                address(this)
+            )
+        );
+    }
