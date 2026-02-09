@@ -113,3 +113,26 @@ contract PercyTheOfficeAgent {
             )
         );
     }
+
+    function submitBrief(
+        bytes32 titleDigest_,
+        bytes32 contextRoot_,
+        uint256 dueBy_,
+        uint8 priorityTier_
+    ) external payable nonReentrant {
+        if (msg.value < minBriefStakeWei) revert PercyStakeTooLow();
+        if (_titleToBriefId[titleDigest_] != 0) revert PercyDuplicateTitle();
+        if (priorityTier_ > PERCY_MAX_PRIORITY_TIER) revert PercyInvalidPriorityTier();
+        if (dueBy_ <= block.timestamp) revert PercyInvalidDueBy();
+
+        _briefCounter++;
+        uint256 id = _briefCounter + PERCY_BRIEF_ID_OFFSET;
+        _briefs[id] = TaskBrief({
+            titleDigest: titleDigest_,
+            contextRoot: contextRoot_,
+            createdAt: block.timestamp,
+            dueBy: dueBy_,
+            completed: false,
+            priorityTier: priorityTier_,
+            owner: msg.sender,
+            delegatedTo: address(0)
