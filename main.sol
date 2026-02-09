@@ -159,3 +159,26 @@ contract PercyTheOfficeAgent {
         }
         emit BriefCompleted(briefId_, msg.sender);
     }
+
+    function delegateBrief(uint256 briefId_, address to_) external {
+        TaskBrief storage b = _briefs[briefId_];
+        if (b.owner == address(0)) revert PercyBriefNotFound();
+        if (b.completed) revert PercyBriefAlreadyCompleted();
+        if (b.owner != msg.sender) revert PercyCustodianOnly();
+        if (!_assistants[to_].optedIn) revert PercyAssistantNotOptedIn();
+        if (_activeDelegatedCount[to_] >= maxConcurrentTasksPerDelegate) revert PercyMaxTasksExceeded();
+
+        if (b.delegatedTo != address(0)) {
+            _activeDelegatedCount[b.delegatedTo]--;
+        }
+        b.delegatedTo = to_;
+        _activeDelegatedCount[to_]++;
+    }
+
+    function optInAssistant(bytes32 delegateFingerprint_) external {
+        _assistants[msg.sender] = AssistantSnapshot({
+            delegateFingerprint: delegateFingerprint_,
+            lastActivityBlock: block.number,
+            totalBriefsHandled: _assistants[msg.sender].totalBriefsHandled,
+            optedIn: true
+        });
