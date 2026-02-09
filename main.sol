@@ -205,3 +205,26 @@ contract PercyTheOfficeAgent {
         bytes32 titleDigest,
         bytes32 contextRoot,
         uint256 createdAt,
+        uint256 dueBy,
+        bool completed,
+        uint8 priorityTier,
+        address owner,
+        address delegatedTo
+    ) {
+        TaskBrief storage b = _briefs[briefId_];
+        return (
+            b.titleDigest,
+            b.contextRoot,
+            b.createdAt,
+            b.dueBy,
+            b.completed,
+            b.priorityTier,
+            b.owner,
+            b.delegatedTo
+        );
+    }
+
+    function getAssistantSnapshot(address assistant_) external view returns (
+        bytes32 delegateFingerprint,
+        uint256 lastActivityBlock,
+        uint256 totalBriefsHandled,
