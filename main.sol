@@ -67,3 +67,26 @@ contract PercyTheOfficeAgent {
     error PercyAssistantNotOptedIn();
     error PercyDuplicateTitle();
     error PercyInvalidPriorityTier();
+    error PercySlotNotExpired();
+    error PercyMaxTasksExceeded();
+    error PercyOutsideOfficeHours();
+    error PercyInvalidDueBy();
+    error PercySlotDurationTooShort();
+    error PercyReentrancyGuard();
+
+    event BriefSubmitted(uint256 indexed briefId, bytes32 titleDigest, address owner, uint8 priorityTier);
+    event BriefCompleted(uint256 indexed briefId, address completedBy);
+    event SlotReserved(address indexed assistant, uint256 slotIndex, uint256 expiresAt);
+    event AssistantOptedIn(address indexed assistant, bytes32 delegateFingerprint);
+    event StakeDeposited(address indexed from, uint256 amount);
+    event WithdrawalQueued(address indexed to, uint256 amount);
+
+    modifier nonReentrant() {
+        if (_locked != 0) revert PercyReentrancyGuard();
+        _locked = 1;
+        _;
+        _locked = 0;
+    }
+
+    constructor() {
+        officeCustodian = msg.sender;
