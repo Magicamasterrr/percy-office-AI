@@ -182,3 +182,26 @@ contract PercyTheOfficeAgent {
             totalBriefsHandled: _assistants[msg.sender].totalBriefsHandled,
             optedIn: true
         });
+        emit AssistantOptedIn(msg.sender, delegateFingerprint_);
+    }
+
+    function reserveSlot(uint256 slotIndex_, uint256 durationBlocks_) external {
+        if (!_assistants[msg.sender].optedIn) revert PercyAssistantNotOptedIn();
+        DelegateSlot storage s = _slots[msg.sender][slotIndex_];
+        if (s.active && s.expiresAt > block.number) revert PercySlotNotExpired();
+        if (durationBlocks_ < PERCY_MIN_SLOT_DURATION_BLOCKS) revert PercySlotDurationTooShort();
+
+        uint256 expiresAt = block.number + durationBlocks_;
+        s.slotIndex = slotIndex_;
+        s.reservedAt = block.number;
+        s.expiresAt = expiresAt;
+        s.active = true;
+        s.slotNonce = keccak256(abi.encodePacked(msg.sender, slotIndex_, block.timestamp, block.prevrandao));
+
+        emit SlotReserved(msg.sender, slotIndex_, expiresAt);
+    }
+
+    function getBrief(uint256 briefId_) external view returns (
+        bytes32 titleDigest,
+        bytes32 contextRoot,
+        uint256 createdAt,
